@@ -38,12 +38,13 @@ async function makeImage (prompt) {
     if (Array.isArray(output)) {
       output = output[0]
     }
-
+    const outputDir = 'outputs'
     const filename = `${predictionId}.webp`
-    await download(output, '.', { filename })
+    await download(output, outputDir, { filename })
 
-    const currentFilePath = join('.', '_current.webp')
-    copyFileSync(filename, currentFilePath)
+    const outputPath = join(outputDir, filename)
+    const currentFilePath = join(outputDir, '_current.webp')
+    copyFileSync(outputPath, currentFilePath)
   } catch (error) {
     console.error('Error in makeImage function:', error)
   }
