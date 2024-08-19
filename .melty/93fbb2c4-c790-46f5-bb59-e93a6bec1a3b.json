@@ -1,0 +1,42 @@
+{
+  "id": "93fbb2c4-c790-46f5-bb59-e93a6bec1a3b",
+  "name": "I'm trying add cool emojis to my README",
+  "branch": "melty/I'm-trying-add-cool-emojis-to-my-README",
+  "files": [],
+  "savedMeltyMindFiles": [],
+  "conversation": {
+    "joules": [
+      {
+        "id": "2a83161f-64be-4a20-9691-ad5ef59f5678",
+        "message": "I'm trying add cool emojis to my README",
+        "author": "human",
+        "state": "complete",
+        "commit": "5767e760f7c542eb9d623876e5c887e446a7b94a",
+        "diffInfo": {
+          "filePathsChanged": null,
+          "diffPreview": "diff --git a/.env.example b/.env.example\nnew file mode 100644\nindex 0000000..a3ccf3e\n--- /dev/null\n+++ b/.env.example\n@@ -0,0 +1,2 @@\n+REPLICATE_API_TOKEN=your_replicate_api_token_here\n+\ndiff --git a/.gitignore b/.gitignore\nindex d9d7ead..6d5c7cf 100644\n--- a/.gitignore\n+++ b/.gitignore\n@@ -1 +1,2 @@\n-*.webp\n\\ No newline at end of file\n+*.webp\n+.env\ndiff --git a/README.md b/README.md\nnew file mode 100644\nindex 0000000..d5f1dc6\n--- /dev/null\n+++ b/README.md\n@@ -0,0 +1,12 @@\n+## Environment Setup\n+\n+1. Clone this repository.\n+2. Run `npm install` to install dependencies.\n+3. Copy `.env.example` to `.env`:\n+   ```\n+   cp .env.example .env\n+   ```\n+4. Edit `.env` and replace `your_replicate_api_token_here` with your actual Replicate API token.\n+\n+Make sure not to commit your `.env` file to version control.\n+\ndiff --git a/index.js b/index.js\nindex f01a295..4ce8ccd 100644\n--- a/index.js\n+++ b/index.js\n@@ -1,9 +1,14 @@\n+import 'dotenv/config'\n import Replicate from 'replicate'\n import download from 'download'\n+import { writeFile } from 'fs/promises'\n import { copyFileSync } from 'node:fs'\n import { join } from 'node:path'\n \n-const replicate = new Replicate()\n+// Initialize the Replicate client with your API token from .env\n+const replicate = new Replicate({\n+  auth: process.env.REPLICATE_API_TOKEN,\n+})\n \n const theme = process.argv[2] || 'nature'\ndiff --git a/package-lock.json b/package-lock.json\nindex df1d4fc..432c4b4 100644\n--- a/package-lock.json\n+++ b/package-lock.json\n@@ -5,6 +5,7 @@\n   \"packages\": {\n     \"\": {\n       \"dependencies\": {\n+        \"dotenv\": \"^16.3.1\",\n         \"download\": \"^8.0.0\",\n         \"replicate\": \"^0.32.0\"\n       },\n@@ -1100,6 +1101,18 @@\n         \"node\": \">=6.0.0\"\n       }\n     },\n+    \"node_modules/dotenv\": {\n+      \"version\": \"16.4.5\",\n+      \"resolved\": \"https://registry.npmjs.org/dotenv/-/dotenv-16.4.5.tgz\",\n+      \"integrity\": \"sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==\",\n+      \"license\": \"BSD-2-Clause\",\n+      \"engines\": {\n+        \"node\": \">=12\"\n+      },\n+      \"funding\": {\n+        \"url\": \"https://dotenvx.com\"\n+      }\n+    },\n     \"node_modules/download\": {\n       \"version\": \"8.0.0\",\n       \"resolved\": \"https://registry.npmjs.org/download/-/download-8.0.0.tgz\",\ndiff --git a/package.json b/package.json\nindex f249758..d88e294 100644\n--- a/package.json\n+++ b/package.json\n@@ -2,7 +2,8 @@\n   \"type\": \"module\",\n   \"dependencies\": {\n     \"download\": \"^8.0.0\",\n-    \"replicate\": \"^0.32.0\"\n+    \"replicate\": \"^0.32.0\",\n+    \"dotenv\": \"^16.3.1\"\n   },\n   \"devDependencies\": {\n     \"standard\": \"^17.1.0\""
+        }
+      },
+      {
+        "id": "a2c47f43-21ad-44dc-b6cf-da6746b1a84e",
+        "message": "Certainly! Adding emojis to your README can make it more visually appealing and help certain sections stand out. Let's take a look at your current README and see how we can enhance it with some emojis. Could you please provide the contents of your README.md file using the <FileContents> tag?\n",
+        "author": "bot",
+        "state": "complete",
+        "commit": null,
+        "diffInfo": null,
+        "botExecInfo": {
+          "rawOutput": "Certainly! Adding emojis to your README can make it more visually appealing and help certain sections stand out. Let's take a look at your current README and see how we can enhance it with some emojis. Could you please provide the contents of your README.md file using the <FileContents> tag?",
+          "contextPaths": [],
+          "assistantType": "coder"
+        }
+      }
+    ]
+  },
+  "gitRepo": {
+    "repository": null,
+    "rootPath": "/Users/z/obs/fresh-backgrounds"
+  },
+  "createdAt": "2024-08-19T22:40:36.118Z",
+  "updatedAt": "2024-08-19T22:41:16.728Z",
+  "fileManager": null
+}
