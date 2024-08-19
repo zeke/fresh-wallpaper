@@ -1,9 +1,14 @@
+import 'dotenv/config'
 import Replicate from 'replicate'
 import download from 'download'
+import { writeFile } from 'fs/promises'
 import { copyFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-const replicate = new Replicate()
+// Initialize the Replicate client with your API token from .env
+const replicate = new Replicate({
+  auth: process.env.REPLICATE_API_TOKEN,
+})
 
 const theme = process.argv[2] || 'nature'
 

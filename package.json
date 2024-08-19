@@ -2,7 +2,8 @@
   "type": "module",
   "dependencies": {
     "download": "^8.0.0",
-    "replicate": "^0.32.0"
+    "replicate": "^0.32.0",
+    "dotenv": "^16.3.1"
   },
   "devDependencies": {
     "standard": "^17.1.0"
