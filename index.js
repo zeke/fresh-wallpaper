@@ -1,9 +1,9 @@
 import 'dotenv/config'
 import Replicate from 'replicate'
 import download from 'download'
-import { writeFile } from 'fs/promises'
 import { copyFileSync } from 'node:fs'
 import { join } from 'node:path'
+import dedent from 'dedent'
 
 // Initialize the Replicate client with your API token from .env
 const replicate = new Replicate({
@@ -16,8 +16,14 @@ async function makePrompt () {
   const model = 'meta/meta-llama-3.1-405b-instruct'
   const input = {
     prompt: `Something ${theme} themed`,
-    system_prompt: "You write descriptive and stylistic prompts for image generation models. The prompts should generate images that look good with a human's face green-screened and centered on a layer above it. You don't talk about the prompt. You just output it.",
+    system_prompt: dedent`
+      You write descriptive and stylistic prompts for image generation models. 
+      The prompts should generate images that look good with a human's face green-screened and centered on a layer above it. 
+      You don't talk about the prompt. You just output it.
+    `,
   };
+
+  console.log({input})
   
   const output = await replicate.run(model, { input })
   return output.join('')
