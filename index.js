@@ -46,20 +46,21 @@ async function makeImage (prompt) {
     output_quality: 90
   }
 
-  let predictionId
+  let prediction
   let output
 
   try {
-    output = await replicate.run(model, { input }, ({ id }) => {
-      predictionId = id
+    output = await replicate.run(model, { input }, (predictionData) => {
+      prediction = predictionData
     })
 
     if (Array.isArray(output)) {
       output = output[0]
     }
     const outputDir = 'outputs'
-    const filename = `${predictionId}.webp`
+    const filename = `${prediction.id}.webp`
     await download(output, outputDir, { filename })
+
 
     const outputPath = join(outputDir, filename)
     const currentFilePath = join(outputDir, '_current.webp')
