@@ -4,6 +4,7 @@
     "dedent": "^1.5.3",
     "dotenv": "^16.3.1",
     "download": "^8.0.0",
+    "exiftool-vendored": "^28.2.1",
     "replicate": "^0.32.0"
   },
   "devDependencies": {
