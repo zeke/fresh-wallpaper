@@ -36,7 +36,9 @@ async function makePrompt () {
   console.log({ input })
 
   const output = await replicate.run(model, { input })
-  return output.join('')
+  return output
+    .join('')
+    .replace(/^"|"$/g, '') // remove leading and trailing double quotes
 }
 
 async function makeImage (prompt) {
