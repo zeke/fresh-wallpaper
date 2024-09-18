@@ -2,17 +2,17 @@ import 'dotenv/config'
 import Replicate from 'replicate'
 import download from 'download'
 import { copyFileSync, readFileSync } from 'node:fs'
+import { execSync } from 'node:child_process'
 import { join } from 'node:path'
 import dedent from 'dedent'
-import { ExifTool } from 'exiftool-vendored'
 import { platform } from 'node:process'
+import MediaProvenance from 'media-provenance'
 
-// Initialize the Replicate client with your API token from .env
-const replicate = new Replicate({
-  auth: process.env.REPLICATE_API_TOKEN
-})
+const replicate = new Replicate()
 
 let theme = process.argv[2]
+const outputDir = 'outputs'
+const interval = 1000
 
 async function makePrompt () {
   if (!theme) {
@@ -59,58 +59,55 @@ async function makeImage (prompt) {
     if (Array.isArray(output)) {
       output = output[0]
     }
-    const outputDir = 'outputs'
+
     const filename = `${prediction.id}.webp`
     await download(output, outputDir, { filename })
 
+    const outputPath = join(outputDir, filename)
 
-    const outputPath = join(outputDir, filename);
-    
-
-    const exiftool = new ExifTool();
-    
-    try {
-      // Create a new object without the 'logs' property
-      const { logs, ...predictionWithoutLogs } = prediction;
-      const predictionJson = JSON.stringify(predictionWithoutLogs, null, 2);
-
-      // Write prediction data to EXIF
-      await exiftool.write(outputPath, {
-        UserComment: predictionJson,
-      });
-    } catch (exifError) {
-      console.error('Error writing EXIF data:', exifError);
-    }
-
-    const currentFilePath = join(outputDir, '_current.webp')
-    copyFileSync(outputPath, currentFilePath)
-
-
-    // Set the generated image as desktop wallpaper on macOS
-    try {
-      const { execSync } = await import('node:child_process');
-
-      if (platform === 'darwin') {
-        const absolutePath = join(process.cwd(), outputPath);
-        const setWallpaperCommand = `osascript -e 'tell application "System Events" to set picture of every desktop to "${absolutePath}"'`;
-        execSync(setWallpaperCommand);
-        console.log('Desktop wallpaper updated successfully');
-      } else {
-        console.log('Setting wallpaper is only supported on macOS');
+    // Add MediaProvenance metadata to the image file
+    // See https://github.com/zeke/media-provenance
+    const provenanceData = {
+      provider: 'Replicate (https://replicate.com/)',
+      model,
+      input: prediction.input,
+      output: prediction.output,
+      meta: {
+        ...prediction,
+        input: undefined,
+        output: undefined,
+        logs: undefined
       }
-    } catch (wallpaperError) {
-      console.error('Error setting desktop wallpaper:', wallpaperError);
     }
+    await MediaProvenance.set(outputPath, provenanceData)
 
+    copyFileSync(outputPath, join(outputDir, '_current.webp'))
 
+    return outputPath
   } catch (error) {
     console.error('Error in makeImage function:', error)
+  }
+}
+
+async function setWallpaper (outputPath) {
+  try {
+    if (platform === 'darwin') {
+      const absolutePath = join(process.cwd(), outputPath)
+      const setWallpaperCommand = `osascript -e 'tell application "System Events" to set picture of every desktop to "${absolutePath}"'`
+      execSync(setWallpaperCommand)
+      console.log('Desktop wallpaper updated successfully')
+    } else {
+      console.log('Setting wallpaper is only supported on macOS')
+    }
+  } catch (wallpaperError) {
+    console.error('Error setting desktop wallpaper:', wallpaperError)
   }
 }
 
 while (true) {
   const prompt = await makePrompt()
   console.log({ prompt })
-  await makeImage(prompt)
-  await new Promise(resolve => setTimeout(resolve, 1000))
+  const imageFile = await makeImage(prompt)
+  await setWallpaper(imageFile)
+  await new Promise(resolve => setTimeout(resolve, interval))
 }
