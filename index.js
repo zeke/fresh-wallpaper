@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import 'dotenv/config'
 import Replicate from 'replicate'
 import { copyFileSync, mkdirSync } from 'node:fs'
