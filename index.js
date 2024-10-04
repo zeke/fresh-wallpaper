@@ -6,30 +6,44 @@ import { join } from 'node:path'
 import dedent from 'dedent'
 import MediaProvenance from 'media-provenance'
 import { setWallpaper } from 'wallpaper'
+import minimist from 'minimist'
 
 const replicate = new Replicate()
 
-const theme = process.argv[2]
-const outputDir = 'outputs'
-const interval = 1000
+const argv = minimist(process.argv.slice(2))
+const theme = argv._[0]
+const imageModel = argv['image-model'] || 'black-forest-labs/flux-schnell'
+const outputDir = argv.output || 'outputs'
+const interval = argv.interval || 1000
+
+function usage () {
+  console.log(dedent`
+    Usage: node index.js <theme> [options]
+
+    Options:
+      --image-model <model>  Specify the image model to use (default: 'black-forest-labs/flux-schnell')
+      --output <directory>   Specify the output directory for images (default: 'outputs')
+      --interval <ms>        Specify the interval between image generations in milliseconds (default: 1000)
+
+    Example:
+      node index.js "bananas dressed up like cowboys" --image-model "stability-ai/stable-diffusion" --output "my-images" --interval 5000
+  `)
+  process.exit()
+}
+
+if (!theme) {
+  usage()
+}
 
 async function makePrompt () {
-  // if (!theme) {
-  //   const transcriptPath = join(process.env.HOME, 'eavesdrop-transcript.txt')
-  //   const fileContent = readFileSync(transcriptPath, 'utf-8')
-  //   const lines = fileContent.trim().split('\n')
-  //   theme = lines.slice(-3).join('\n')
-  // }
-
-  return theme
-
   const model = 'meta/meta-llama-3.1-405b-instruct'
   const input = {
     prompt: theme,
     system_prompt: dedent`Take the given theme and turn it into a good image prompt. Always include the word ZIKI in the prompts.`.trim()
   }
 
-  console.log({ input })
+  console.log('Enhancing prompt...')
+  console.log({ model, input })
 
   const output = await replicate.run(model, { input })
   return output
@@ -38,8 +52,7 @@ async function makePrompt () {
 }
 
 async function makeImage (prompt) {
-  // const model = 'black-forest-labs/flux-schnell'
-  const model = 'zeke/ziki-flux:dadc276a9062240e68f110ca06521752f334777a94f031feb0ae78ae3edca58e'
+  const model = imageModel
   const input = {
     prompt,
     aspect_ratio: '16:9'
@@ -92,4 +105,5 @@ while (true) {
   const imageFile = await makeImage(prompt)
   await setWallpaper(imageFile)
   await new Promise(resolve => setTimeout(resolve, interval))
+  console.log('\n\n')
 }
