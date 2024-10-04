@@ -112,6 +112,12 @@ async function makeImage (prompt) {
     return outputPath
   } catch (error) {
     console.error('Error in makeImage function:', error)
+    if (error.message && error.message.toLowerCase().includes('nsfw')) {
+      console.log('NSFW error detected. Retrying with a different prompt...')
+      return makeImage(await makePrompt(theme))
+    } else {
+      throw error
+    }
   }
 }
 
