@@ -1,41 +1,51 @@
 import 'dotenv/config'
 import Replicate from 'replicate'
-import { copyFileSync } from 'node:fs'
+import { copyFileSync, mkdirSync } from 'node:fs'
 import download from 'download'
 import { join } from 'node:path'
 import dedent from 'dedent'
 import MediaProvenance from 'media-provenance'
 import { setWallpaper } from 'wallpaper'
 import minimist from 'minimist'
+import os from 'os'
 
 const replicate = new Replicate()
 
 const argv = minimist(process.argv.slice(2))
 const theme = argv._[0]
 const imageModel = argv['image-model'] || 'black-forest-labs/flux-schnell'
-const outputDir = argv.output || 'outputs'
+const outputDir = argv.output || join(os.homedir(), '.fresh-backgrounds')
 const interval = argv.interval || 1000
 
 function usage () {
   console.log(dedent`
-    Usage: node index.js <theme> [options]
+    Usage: fresh-wallpaper <theme> [options]
 
     Options:
       --image-model <model>  Specify the image model to use (default: 'black-forest-labs/flux-schnell')
-      --output <directory>   Specify the output directory for images (default: 'outputs')
+      --output <directory>   Specify the output directory for images (default: '~/.fresh-backgrounds')
       --interval <ms>        Specify the interval between image generations in milliseconds (default: 1000)
 
-    Example:
-      node index.js "bananas dressed up like cowboys" --image-model "stability-ai/stable-diffusion" --output "my-images" --interval 5000
+    Examples:
+      Basic usage:
+        fresh-wallpaper "bananas dressed up like cowboys"
+
+      Using a different image model:
+        fresh-wallpaper "ZIKI the man dressed up like a cowboy" --image-model "zeke/ziki-flux:dadc276a9062240e68f110ca06521752f334777a94f031feb0ae78ae3edca58e"
+
+      Custom output directory:
+        fresh-wallpaper "bananas dressed up like cowboys" --output "my-images"
+
+      Generate images every 5 seconds:
+        fresh-wallpaper "bananas dressed up like cowboys" --interval 5000
+
+      Combining multiple options:
+        fresh-wallpaper "ZIKI in a banana costume" --image-model "stability-ai/stable-diffusion" --output "ziki-bananas" --interval 10000
   `)
   process.exit()
 }
 
-if (!theme) {
-  usage()
-}
-
-async function makePrompt () {
+async function makePrompt (theme) {
   const model = 'meta/meta-llama-3.1-405b-instruct'
   const input = {
     prompt: theme,
@@ -46,9 +56,13 @@ async function makePrompt () {
   console.log({ model, input })
 
   const output = await replicate.run(model, { input })
-  return output
+  const prompt = output
     .join('')
     .replace(/^"|"$/g, '') // remove leading and trailing double quotes
+
+  console.log('Enhanced prompt:', prompt)
+
+  return prompt
 }
 
 async function makeImage (prompt) {
@@ -99,9 +113,12 @@ async function makeImage (prompt) {
   }
 }
 
+mkdirSync(outputDir, { recursive: true })
+
 while (true) {
-  const prompt = await makePrompt()
-  console.log({ prompt })
+  if (!theme) usage()
+
+  const prompt = await makePrompt(theme)
   const imageFile = await makeImage(prompt)
   await setWallpaper(imageFile)
   await new Promise(resolve => setTimeout(resolve, interval))
