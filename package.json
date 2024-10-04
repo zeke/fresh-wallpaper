@@ -1,6 +1,6 @@
 {
   "name": "fresh-wallpaper",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A Node.js command-line tool that continuously generates fresh desktop wallpapers using AI-powered image generation models on Replicate.",
   "bin": {
     "fresh-wallpaper": "./index.js",
