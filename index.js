@@ -36,13 +36,10 @@ function usage () {
         fresh-wallpaper "ZIKI the man dressed up like a cowboy" --image-model "zeke/ziki-flux:dadc276a9062240e68f110ca06521752f334777a94f031feb0ae78ae3edca58e"
 
       Custom output directory:
-        fresh-wallpaper "bananas dressed up like cowboys" --output "my-images"
+        fresh-wallpaper "bananas dressed up like cowboys" --output "cowboy-bananas"
 
       Generate images every 5 seconds:
         fresh-wallpaper "bananas dressed up like cowboys" --interval 5000
-
-      Combining multiple options:
-        fresh-wallpaper "ZIKI in a banana costume" --image-model "stability-ai/stable-diffusion" --output "ziki-bananas" --interval 10000
   `)
   process.exit()
 }
