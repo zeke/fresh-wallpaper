@@ -1,36 +1,32 @@
 import 'dotenv/config'
 import Replicate from 'replicate'
+import { copyFileSync } from 'node:fs'
 import download from 'download'
-import { copyFileSync, readFileSync } from 'node:fs'
-import { execSync } from 'node:child_process'
 import { join } from 'node:path'
 import dedent from 'dedent'
-import { platform } from 'node:process'
 import MediaProvenance from 'media-provenance'
+import { setWallpaper } from 'wallpaper'
 
 const replicate = new Replicate()
 
-let theme = process.argv[2]
+const theme = process.argv[2]
 const outputDir = 'outputs'
 const interval = 1000
 
 async function makePrompt () {
-  if (!theme) {
-    const transcriptPath = join(process.env.HOME, 'eavesdrop-transcript.txt')
-    const fileContent = readFileSync(transcriptPath, 'utf-8')
-    const lines = fileContent.trim().split('\n')
-    theme = lines.slice(-3).join('\n')
-  }
+  // if (!theme) {
+  //   const transcriptPath = join(process.env.HOME, 'eavesdrop-transcript.txt')
+  //   const fileContent = readFileSync(transcriptPath, 'utf-8')
+  //   const lines = fileContent.trim().split('\n')
+  //   theme = lines.slice(-3).join('\n')
+  // }
+
+  return theme
 
   const model = 'meta/meta-llama-3.1-405b-instruct'
   const input = {
     prompt: theme,
-    system_prompt: dedent`
-      You write descriptive and stylistic prompts for image generation models. 
-      The prompts should generate images that look good with a human's face green-screened and centered on a layer above it. 
-      You don't talk about the prompt. You just output it.
-      The prompt you receive is a transcribed snippet of a recorded conversation. Select the topic from the conversation that is most identifiable as something that can be portrayed in an image, and use that as the subject.
-    `
+    system_prompt: dedent`Take the given theme and turn it into a good image prompt. Always include the word ZIKI in the prompts.`.trim()
   }
 
   console.log({ input })
@@ -42,12 +38,11 @@ async function makePrompt () {
 }
 
 async function makeImage (prompt) {
-  const model = 'black-forest-labs/flux-schnell'
+  // const model = 'black-forest-labs/flux-schnell'
+  const model = 'zeke/ziki-flux:dadc276a9062240e68f110ca06521752f334777a94f031feb0ae78ae3edca58e'
   const input = {
     prompt,
-    aspect_ratio: '16:9',
-    output_format: 'webp',
-    output_quality: 90
+    aspect_ratio: '16:9'
   }
 
   let prediction
@@ -88,21 +83,6 @@ async function makeImage (prompt) {
     return outputPath
   } catch (error) {
     console.error('Error in makeImage function:', error)
-  }
-}
-
-async function setWallpaper (outputPath) {
-  try {
-    if (platform === 'darwin') {
-      const absolutePath = join(process.cwd(), outputPath)
-      const setWallpaperCommand = `osascript -e 'tell application "System Events" to set picture of every desktop to "${absolutePath}"'`
-      execSync(setWallpaperCommand)
-      console.log('Desktop wallpaper updated successfully')
-    } else {
-      console.log('Setting wallpaper is only supported on macOS')
-    }
-  } catch (wallpaperError) {
-    console.error('Error setting desktop wallpaper:', wallpaperError)
   }
 }
 

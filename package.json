@@ -5,13 +5,14 @@
     "dotenv": "^16.3.1",
     "download": "^8.0.0",
     "media-provenance": "^1.1.0",
-    "replicate": "^0.32.0"
+    "replicate": "^0.32.0",
+    "wallpaper": "^7.2.1"
   },
   "devDependencies": {
     "standard": "^17.1.0"
   },
   "scripts": {
     "lint": "standard --fix",
-    "test": "standard"
+    "test": "standard --fix"
   }
 }
