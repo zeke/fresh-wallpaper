@@ -8,7 +8,7 @@ I use this with [OBS](https://obsproject.com/) to create background images on th
 
 - Generates images from a given theme
 - Sets the system desktop wallpaper
-- Saves all generated images to disk
+- Saves all generated images to disk (default: `~/fresh-wallpaper`)
 - Saves a copy of the latest generated image as `_latest.webp` (so you can point [OBS](https://obsproject.com/) to that file)
 - Adds [MediaProvenance](https://github.com/zeke/media-provenance) metadata to downloaded images so you have a record of the model, input, output, etc.
 

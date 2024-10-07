@@ -16,7 +16,7 @@ const replicate = new Replicate()
 const argv = minimist(process.argv.slice(2))
 const theme = argv._[0]
 const imageModel = argv['image-model'] || 'black-forest-labs/flux-schnell'
-const outputDir = argv.output || join(os.homedir(), '.fresh-backgrounds')
+const outputDir = argv.output || join(os.homedir(), 'fresh-wallpaper')
 const interval = argv.interval || 1000
 
 function usage () {
@@ -25,7 +25,7 @@ function usage () {
 
     Options:
       --image-model <model>  Specify the image model to use (default: 'black-forest-labs/flux-schnell')
-      --output <directory>   Specify the output directory for images (default: '~/.fresh-backgrounds')
+      --output <directory>   Specify the output directory for images (default: '~/fresh-wallpaper')
       --interval <ms>        Specify the interval between image generations in milliseconds (default: 1000)
 
     Examples:
