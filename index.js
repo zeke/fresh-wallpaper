@@ -45,10 +45,11 @@ function usage () {
 }
 
 async function makePrompt (theme) {
+  return theme
   const model = 'meta/meta-llama-3.1-405b-instruct'
   const input = {
     prompt: theme,
-    system_prompt: dedent`Take the given theme and turn it into a good image prompt. Always include the word ZIKI in the prompts.`.trim()
+    system_prompt: dedent`Take the given theme and turn it into a good image prompt.`.trim()
   }
 
   console.log('Enhancing prompt...')
