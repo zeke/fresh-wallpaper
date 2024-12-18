@@ -51,7 +51,7 @@ function usage () {
 
 async function enhancePrompt (theme) {
   if (!enhancePrompts) return theme
-  
+
   const model = 'meta/meta-llama-3.1-405b-instruct'
   const input = {
     prompt: theme,
