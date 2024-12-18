@@ -18,6 +18,7 @@ const theme = argv._[0]
 const imageModel = argv['image-model'] || 'black-forest-labs/flux-schnell'
 const outputDir = argv.output || join(os.homedir(), 'fresh-wallpaper')
 const interval = argv.interval || 1000
+const enhancePrompts = argv['enhance-prompt'] || false
 
 function usage () {
   console.log(dedent`
@@ -27,10 +28,14 @@ function usage () {
       --image-model <model>  Specify the image model to use (default: 'black-forest-labs/flux-schnell')
       --output <directory>   Specify the output directory for images (default: '~/fresh-wallpaper')
       --interval <ms>        Specify the interval between image generations in milliseconds (default: 1000)
+      --enhance-prompt       Use a language model to enhance your image generation prompt (default: false)
 
     Examples:
       Basic usage:
         fresh-wallpaper "bananas dressed up like cowboys"
+
+      Using prompt enhancement:
+        fresh-wallpaper "bananas dressed up like cowboys" --enhance-prompt
 
       Using a different image model:
         fresh-wallpaper "ZIKI the man dressed up like a cowboy" --image-model "zeke/ziki-flux:dadc276a9062240e68f110ca06521752f334777a94f031feb0ae78ae3edca58e"
@@ -44,8 +49,9 @@ function usage () {
   process.exit()
 }
 
-async function makePrompt (theme) {
-  // return theme
+async function enhancePrompt (theme) {
+  if (!enhancePrompts) return theme
+  
   const model = 'meta/meta-llama-3.1-405b-instruct'
   const input = {
     prompt: theme,
@@ -112,7 +118,7 @@ async function makeImage (prompt) {
     console.error('Error in makeImage function:', error)
     if (error.message && error.message.toLowerCase().includes('nsfw')) {
       console.log('NSFW error detected. Retrying with a different prompt...')
-      return makeImage(await makePrompt(theme))
+      return makeImage(await enhancePrompt(theme))
     } else {
       throw error
     }
@@ -124,7 +130,7 @@ mkdirSync(outputDir, { recursive: true })
 while (true) {
   if (!theme) usage()
 
-  const prompt = await makePrompt(theme)
+  const prompt = await enhancePrompt(theme)
   const imageFile = await makeImage(prompt)
   await setWallpaper(imageFile)
   await new Promise(resolve => setTimeout(resolve, interval))
