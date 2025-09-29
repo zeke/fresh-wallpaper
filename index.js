@@ -2,7 +2,7 @@
 
 import 'dotenv/config'
 import Replicate from 'replicate'
-import { copyFileSync, mkdirSync } from 'node:fs'
+import { copyFileSync, mkdirSync, renameSync } from 'node:fs'
 import download from 'download'
 import { join } from 'node:path'
 import dedent from 'dedent'
@@ -10,6 +10,7 @@ import MediaProvenance from 'media-provenance'
 import { setWallpaper } from 'wallpaper'
 import minimist from 'minimist'
 import os from 'os'
+import { fileTypeFromFile } from 'file-type'
 
 const replicate = new Replicate()
 
@@ -90,14 +91,19 @@ async function makeImage (prompt) {
       output = output[0]
     }
 
-    // Get the file extension from the output URL
-    const urlObj = new URL(output)
-    const extMatch = urlObj.pathname.match(/\.([a-zA-Z0-9]+)$/)
-    const ext = extMatch ? extMatch[1] : 'img'
-    const filename = `${prediction.id}.${ext}`
-    await download(output, outputDir, { filename })
+    // Download with a temporary filename
+    const tempFilename = `${prediction.id}.tmp`
+    await download(output, outputDir, { filename: tempFilename })
+    const tempPath = join(outputDir, tempFilename)
 
+    // Detect the actual file type from the downloaded content
+    const fileType = await fileTypeFromFile(tempPath)
+    const ext = fileType?.ext || 'img'
+
+    // Rename the file with the correct extension
+    const filename = `${prediction.id}.${ext}`
     const outputPath = join(outputDir, filename)
+    renameSync(tempPath, outputPath)
 
     // Add MediaProvenance metadata to the image file
     // See https://github.com/zeke/media-provenance
