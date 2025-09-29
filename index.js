@@ -90,7 +90,11 @@ async function makeImage (prompt) {
       output = output[0]
     }
 
-    const filename = `${prediction.id}.webp`
+    // Get the file extension from the output URL
+    const urlObj = new URL(output)
+    const extMatch = urlObj.pathname.match(/\.([a-zA-Z0-9]+)$/)
+    const ext = extMatch ? extMatch[1] : 'img'
+    const filename = `${prediction.id}.${ext}`
     await download(output, outputDir, { filename })
 
     const outputPath = join(outputDir, filename)
@@ -111,7 +115,8 @@ async function makeImage (prompt) {
     }
     await MediaProvenance.set(outputPath, provenanceData)
 
-    copyFileSync(outputPath, join(outputDir, '_current.webp'))
+    // Use the same extension for the _current file
+    copyFileSync(outputPath, join(outputDir, `_current.${ext}`))
 
     return outputPath
   } catch (error) {
